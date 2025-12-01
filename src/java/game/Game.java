@@ -8,15 +8,20 @@ import game.ghostStates.EatenMode;
 import game.ghostStates.FrightenedMode;
 import game.utils.CollisionDetector;
 import game.utils.CsvReader;
+import game.utils.EntityFactory;
 import game.utils.KeyHandler;
 
 import java.awt.*;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 //Classe gérant le jeu en lui même
 public class Game implements Observer {
+    private Map<String, EntityFactory> entityFactoryMap = new HashMap<>();
+
     //Pour lister les différentes entités présentes sur la fenêtre
     private List<Entity> objects = new ArrayList();
     private List<Ghost> ghosts = new ArrayList();
@@ -42,59 +47,80 @@ public class Game implements Observer {
         int cellSize = 8;
 
         CollisionDetector collisionDetector = new CollisionDetector(this);
-        AbstractGhostFactory abstractGhostFactory = null;
+
+        initializeFactoryRegistry(collisionDetector);
 
         //Le niveau a une "grille", et pour chaque case du fichier csv, on affiche une entité parculière sur une case de la grille selon le caracère présent
         for(int xx = 0 ; xx < cellsPerRow ; xx++) {
             for(int yy = 0 ; yy < cellsPerColumn ; yy++) {
                 String dataChar = data.get(yy).get(xx);
-                if (dataChar.equals("x")) { //Création des murs
-                    objects.add(new Wall(xx * cellSize, yy * cellSize));
-                }else if (dataChar.equals("P")) { //Création de Pacman
-                    pacman = new Pacman(xx * cellSize, yy * cellSize);
-                    pacman.setCollisionDetector(collisionDetector);
 
-                    //Enregistrement des différents observers de Pacman
-                    pacman.registerObserver(GameLauncher.getUIPanel());
-                    pacman.registerObserver(this);
-                }else if (dataChar.equals("b") || dataChar.equals("p") || dataChar.equals("i") || dataChar.equals("c")) { //Création des fantômes en utilisant les différentes factories
-                    switch (dataChar) {
-                        case "b":
-                            abstractGhostFactory = new BlinkyFactory();
-                            break;
-                        case "p":
-                            abstractGhostFactory = new PinkyFactory();
-                            break;
-                        case "i":
-                            abstractGhostFactory = new InkyFactory();
-                            break;
-                        case "c":
-                            abstractGhostFactory = new ClydeFactory();
-                            break;
-                    }
-
-                    Ghost ghost = abstractGhostFactory.makeGhost(xx * cellSize, yy * cellSize);
-                    ghosts.add(ghost);
-                    if (dataChar.equals("b")) {
-                        blinky = (Blinky) ghost;
-                    }
-                }else if (dataChar.equals(".")) { //Création des PacGums
-                    objects.add(new PacGum(xx * cellSize, yy * cellSize));
-                }else if (dataChar.equals("o")) { //Création des SuperPacGums
-                    objects.add(new SuperPacGum(xx * cellSize, yy * cellSize));
-                }else if (dataChar.equals("-")) { //Création des murs de la maison des fantômes
-                    objects.add(new GhostHouse(xx * cellSize, yy * cellSize));
+                // 맵에 등록된 문자가 있으면 해당 엔티티 생성
+                if (entityFactoryMap.containsKey(dataChar)) {
+                    Entity entity = entityFactoryMap.get(dataChar).create(xx * cellSize, yy * cellSize);
+                    if (entity != null) objects.add(entity);
                 }
             }
         }
-        objects.add(pacman);
-        objects.addAll(ghosts);
+    }
 
-        for (Entity o : objects) {
-            if (o instanceof Wall) {
-                walls.add((Wall) o);
-            }
+    // level.csv의 각 문자를 엔티티 생성 함수에 매핑하는 메서드
+    private void initializeFactoryRegistry(CollisionDetector collisionDetector) {
+        // 벽 등록
+        entityFactoryMap.put("x", (x, y) -> {
+            Wall wall = new Wall(x, y);
+            walls.add(wall);
+            return wall;
+        });
+
+        // 유령 집 벽 등록
+        entityFactoryMap.put("-", (x, y) -> {
+            GhostHouse gh = new GhostHouse(x, y);
+            walls.add(gh);
+            return gh;
+        });
+
+        // 팩맨 등록 (부수 효과 처리: Observer 등록, CollisionDetector 설정)
+        entityFactoryMap.put("P", (x, y) -> {
+            pacman = new Pacman(x, y);
+            pacman.setCollisionDetector(collisionDetector);
+            pacman.registerObserver(GameLauncher.getUIPanel());
+            pacman.registerObserver(this);
+            return pacman;
+        });
+
+        // 팩껌 등록
+        entityFactoryMap.put(".", (x, y) -> new PacGum(x, y));
+
+        // 슈퍼팩껌 등록
+        entityFactoryMap.put("o", (x, y) -> new SuperPacGum(x, y));
+
+        // 유령 등록 (부수 효과 처리: ghosts 리스트 추가, blinky 변수 할당)
+        entityFactoryMap.put("b", (x, y) -> createGhost("b", x, y));
+        entityFactoryMap.put("p", (x, y) -> createGhost("p", x, y));
+        entityFactoryMap.put("i", (x, y) -> createGhost("i", x, y));
+        entityFactoryMap.put("c", (x, y) -> createGhost("c", x, y));
+    }
+
+    // 유령 생성 헬퍼 메서드 (람다 식 내부가 너무 복잡해지는 것을 방지)
+    private Entity createGhost(String type, int x, int y) {
+        AbstractGhostFactory factory = null;
+        switch (type) {
+            case "b": factory = new BlinkyFactory(); break;
+            case "p": factory = new PinkyFactory(); break;
+            case "i": factory = new InkyFactory(); break;
+            case "c": factory = new ClydeFactory(); break;
         }
+
+        if (factory != null) {
+            Ghost ghost = factory.makeGhost(x, y);
+            ghosts.add(ghost); // ghosts 리스트에 별도 추가
+            if (type.equals("b")) {
+                blinky = (Blinky) ghost; // blinky 변수 할당
+            }
+            return ghost;
+        }
+        return null;
     }
 
     public static List<Wall> getWalls() {
