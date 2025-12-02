@@ -43,4 +43,8 @@ public abstract class Entity {
     }
 
     public abstract Rectangle getHitbox();
+
+    public int[] getPosition() {
+        return new int[]{xPos, yPos};
+    }
 }
