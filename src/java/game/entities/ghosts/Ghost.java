@@ -1,12 +1,14 @@
 package game.entities.ghosts;
 
 import game.Game;
+import game.entities.Entity;
 import game.entities.MovingEntity;
 import game.ghostStatStrategies.EmpoweredStatStrategy;
 import game.ghostStatStrategies.IGhostStatStrategy;
 import game.ghostStatStrategies.NormalStatStrategy;
 import game.ghostStates.*;
 import game.ghostStrategies.IGhostStrategy;
+import game.utils.Utils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -106,6 +108,10 @@ public abstract class Ghost extends MovingEntity {
 
     public GhostState getState() {
         return state;
+    }
+
+    public double distanceTo(Entity entity) {
+        return Utils.getDistance(xPos, yPos, entity.getxPos(), entity.getyPos());
     }
 
     @Override
