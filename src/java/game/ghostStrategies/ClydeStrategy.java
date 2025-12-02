@@ -8,7 +8,7 @@ import game.entities.ghosts.Ghost;
 //Stratégie concrète de Clyde (le fantôme jaune)
 public class ClydeStrategy implements IGhostStrategy{
     private Ghost ghost;
-    private final int[] SCATTER_TARGET = {0, GameplayPanel.height};
+    private final int[] SCATTER_TARGET = new int[]{0, GameplayPanel.height};
 
     public ClydeStrategy(Ghost ghost) {
         this.ghost = ghost;
