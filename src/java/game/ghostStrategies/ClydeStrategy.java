@@ -2,7 +2,6 @@ package game.ghostStrategies;
 
 import game.Game;
 import game.GameplayPanel;
-import game.entities.Entity;
 import game.entities.Position;
 import game.entities.ghosts.Ghost;
 
@@ -18,7 +17,7 @@ public class ClydeStrategy implements IGhostStrategy{
     //Clyde cible directement Pacman s'il est au dela d'un rayon de 8 cases, et sinon il cible sa position de pause
     @Override
     public Position getChaseTargetPosition() {
-        Entity pacman = Game.getPacman();
+        var pacman = Game.getPacman();
 
         if (ghost.distanceTo(pacman) >= 256) {
             return pacman.getPosition();

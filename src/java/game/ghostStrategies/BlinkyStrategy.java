@@ -2,7 +2,6 @@ package game.ghostStrategies;
 
 import game.Game;
 import game.GameplayPanel;
-import game.entities.Entity;
 import game.entities.Position;
 
 //Stratégie concrète de Blinky (le fantôme rouge)
@@ -12,7 +11,7 @@ public class BlinkyStrategy implements IGhostStrategy{
     //Blinky cible directement la position de Pacman
     @Override
     public Position getChaseTargetPosition() {
-        Entity pacman = Game.getPacman();
+        var pacman = Game.getPacman();
         return pacman.getPosition();
     }
 
