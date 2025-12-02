@@ -5,6 +5,8 @@ import game.utils.Utils;
 
 //Stratégie concrète de Pinky (le fantôme rose)
 public class PinkyStrategy implements IGhostStrategy {
+    private final int[] SCATTER_TARGET = new int[]{0, 0};
+
     //Pinky cible deux cases devant de Pacman
     @Override
     public int[] getChaseTargetPosition() {
@@ -18,9 +20,6 @@ public class PinkyStrategy implements IGhostStrategy {
     //En pause, Pinky cible la case en haut à gauche
     @Override
     public int[] getScatterTargetPosition() {
-        int[] position = new int[2];
-        position[0] = 0;
-        position[1] = 0;
-        return position;
+        return SCATTER_TARGET;
     }
 }

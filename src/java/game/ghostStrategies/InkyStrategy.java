@@ -8,6 +8,8 @@ import game.utils.Utils;
 //Stratégie concrète d'Inky (le fantôme bleu)
 public class InkyStrategy implements IGhostStrategy{
     private Ghost otherGhost;
+    private final int[] SCATTER_TARGET = new int[]{GameplayPanel.width, GameplayPanel.height};
+
     public InkyStrategy(Ghost ghost) {
         this.otherGhost = ghost;
     }
@@ -28,9 +30,6 @@ public class InkyStrategy implements IGhostStrategy{
     //En pause, Inky cible la case en bas à droite
     @Override
     public int[] getScatterTargetPosition() {
-        int[] position = new int[2];
-        position[0] = GameplayPanel.width;
-        position[1] = GameplayPanel.height;
-        return position;
+        return SCATTER_TARGET;
     }
 }
