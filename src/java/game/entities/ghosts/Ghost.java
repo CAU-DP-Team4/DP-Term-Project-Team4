@@ -92,12 +92,16 @@ public abstract class Ghost extends MovingEntity {
         this.strategy = strategy;
     }
 
-    public IGhostStatStrategy getStatStrategy() {
-        return this.statStrategy;
-    }
-
     public void setStatStrategy(IGhostStatStrategy statStrategy) {
         this.statStrategy = statStrategy;
+    }
+
+    public int getSpeedMultiplier() {
+        return statStrategy.getSpeedMultiplier();
+    }
+
+    public int getScoreMultiplier() {
+        return statStrategy.getScoreMultiplier();
     }
 
     public GhostState getState() {
@@ -126,7 +130,6 @@ public abstract class Ghost extends MovingEntity {
         //Si le fantôme est dans l'état chaseMode ou scatterMode, un timer se lance, et au bout de 5s ou 20s selon l'état, l'état est notifié ensuite afin d'appliquer la transition adéquate
         if (state == chaseMode || state == scatterMode) {
             modeTimer++;
-            System.out.println(modeTimer);
 
             if ((isChasing && modeTimer >= (60 * 20)) || (!isChasing && modeTimer >= (60 * 5))) {
                 state.timerModeOver();
@@ -145,7 +148,7 @@ public abstract class Ghost extends MovingEntity {
             state.insideHouse();
         }
 
-        int loopCount = statStrategy.getSpeedMultiplier();
+        int loopCount = getSpeedMultiplier();
         for(int i=0; i<loopCount; i++) {
             state.computeNextDir();
             updatePosition();
