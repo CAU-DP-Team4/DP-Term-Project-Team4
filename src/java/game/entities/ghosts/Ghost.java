@@ -111,7 +111,7 @@ public abstract class Ghost extends MovingEntity {
     }
 
     public double distanceTo(Entity entity) {
-        return Utils.getDistance(xPos, yPos, entity.getxPos(), entity.getyPos());
+        return Utils.getDistance(getXPos(), getYPos(), entity.getXPos(), entity.getYPos());
     }
 
     @Override
@@ -145,12 +145,12 @@ public abstract class Ghost extends MovingEntity {
         }
 
         //Si le fantôme est sur la case juste au dessus de sa maison, l'état est notifié afin d'appliquer la transition adéquate
-        if (xPos == 208 && yPos == 168) {
+        if (getXPos() == 208 && getYPos() == 168) {
             state.outsideHouse();
         }
 
         //Si le fantôme est sur la case au milieu sa maison, l'état est notifié afin d'appliquer la transition adéquate
-        if (xPos == 208 && yPos == 200) {
+        if (getXPos() == 208 && getYPos() == 200) {
             state.insideHouse();
         }
 
@@ -166,14 +166,14 @@ public abstract class Ghost extends MovingEntity {
         //Différents sprites sont utilisés selon l'état du fantôme (après réflexion, il aurait peut être été plus judicieux de faire une méthode "render" dans GhostState)
         if (state == frightenedMode) {
             if (frightenedTimer <= (60 * 5) || frightenedTimer%20 > 10) {
-                g.drawImage(frightenedSprite1.getSubimage((int)subimage * size, 0, size, size), this.xPos, this.yPos,null);
+                g.drawImage(frightenedSprite1.getSubimage((int)subimage * size, 0, size, size), getXPos(), getYPos(), null);
             }else{
-                g.drawImage(frightenedSprite2.getSubimage((int)subimage * size, 0, size, size), this.xPos, this.yPos,null);
+                g.drawImage(frightenedSprite2.getSubimage((int)subimage * size, 0, size, size), getXPos(), getYPos(), null);
             }
         }else if (state == eatenMode) {
-            g.drawImage(eatenSprite.getSubimage(direction * size, 0, size, size), this.xPos, this.yPos,null);
+            g.drawImage(eatenSprite.getSubimage(direction * size, 0, size, size), getXPos(), getYPos(), null);
         }else{
-            g.drawImage(sprite.getSubimage((int)subimage * size + direction * size * nbSubimagesPerCycle, 0, size, size), this.xPos, this.yPos,null);
+            g.drawImage(sprite.getSubimage((int)subimage * size + direction * size * nbSubimagesPerCycle, 0, size, size), getXPos(), getYPos(), null);
         }
 
     }

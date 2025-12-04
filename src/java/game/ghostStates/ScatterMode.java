@@ -1,5 +1,6 @@
 package game.ghostStates;
 
+import game.entities.Position;
 import game.entities.ghosts.Ghost;
 
 //Classe pour décrire l'état concret d'un fantôme en train de faire une pause
@@ -22,7 +23,7 @@ public class ScatterMode extends GhostState{
 
     //Dans cet état, la position ciblée dépend de la stratégie du fantôme
     @Override
-    public int[] getTargetPosition() {
+    public Position getTargetPosition() {
         return ghost.getStrategy().getScatterTargetPosition();
     }
 }

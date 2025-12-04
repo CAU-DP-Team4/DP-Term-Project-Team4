@@ -36,11 +36,9 @@ public abstract class MovingEntity extends Entity {
 
     public void updatePosition() {
         //Mise à jour de la position de l'entité
-        if (!(xSpd == 0 && ySpd == 0)) { //Si la vitesse horizontale ou la vitesse verticale n'est pas nulle, on incrémente la position horizontale et verticale en conséquence
-            xPos+=xSpd;
-            yPos+=ySpd;
+        if (!(xSpd == 0 && ySpd == 0)) {
+            position.translate(xSpd, ySpd);
 
-            //En fonction de la direction emprunté, on change la valeur de la direction (un entier permettant de savoir la partie de l'image à afficher notamment)
             if (xSpd > 0) {
                 direction = 0;
             } else if (xSpd < 0) {
@@ -51,48 +49,53 @@ public abstract class MovingEntity extends Entity {
                 direction = 3;
             }
 
-            //On incrémente la valeur de l'image courante de l'animation à afficher (la vitesse peut varier), et selon le nombre d'images de l'animation, la valeur fait une boucle
             subimage += imageSpd;
             if (subimage >= nbSubimagesPerCycle) {
                 subimage = 0;
             }
         }
 
-        //Si l'entité va au dela des bords de la zone de jeu, elle passe de l'autre côté
-        if (xPos > GameplayPanel.width) {
-            xPos = 0 - size + spd;
+        if (position.getX() > GameplayPanel.width) {
+            position.set(0 - size + spd, position.getY());
         }
 
-        if (xPos < 0 - size + spd) {
-            xPos = GameplayPanel.width;
+        if (position.getX() < 0 - size + spd) {
+            position.set(GameplayPanel.width, position.getY());
         }
 
-        if (yPos > GameplayPanel.height) {
-            yPos = 0 - size + spd;
+        if (position.getY() > GameplayPanel.height) {
+            position.set(position.getX(), 0 - size + spd);
         }
 
-        if (yPos < 0 - size + spd) {
-            yPos = GameplayPanel.height;
+        if (position.getY() < 0 - size + spd) {
+            position.set(position.getX(), GameplayPanel.height);
         }
     }
 
     @Override
     public void render(Graphics2D g) {
-        //Par défaut, on considère que chaque "sprite" contient 4 variations de l'animation correspondant à une direction et chaque animation a un certain nombre d'images
-        //En sachant cela, on affiche seulement la partie de l'image du sprite correspondant à la bonne direction et à la bonne frame de l'animation
-        g.drawImage(sprite.getSubimage((int)subimage * size + direction * size * nbSubimagesPerCycle, 0, size, size), this.xPos, this.yPos,null);
+        g.drawImage(
+                sprite.getSubimage((int)subimage * size + direction * size * nbSubimagesPerCycle, 0, size, size),
+                position.getX(),
+                position.getY(),
+                null
+        );
     }
 
     //Méthode pour savoir si l'entité est bien positionnée sur une case de la grille de la zone de jeu ou non
     public boolean onTheGrid() {
-        return (xPos%8 == 0 && yPos%8 == 0);
+        return (position.getX() % 8 == 0 && position.getY() % 8 == 0);
     }
 
     //Méthode pour savoir si l'entité est dans la zone de jeu ou non
-    public boolean onGameplayWindow() { return !(xPos<=0 || xPos>= GameplayPanel.width || yPos<=0 || yPos>= GameplayPanel.height); }
+    public boolean onGameplayWindow() {
+        int x = position.getX();
+        int y = position.getY();
+        return !(x <= 0 || x >= GameplayPanel.width || y <= 0 || y >= GameplayPanel.height);
+    }
 
     public Rectangle getHitbox() {
-        return new Rectangle(xPos, yPos, size, size);
+        return new Rectangle(position.getX(), position.getY(), size, size);
     }
 
     public BufferedImage getSprite() {
@@ -111,47 +114,20 @@ public abstract class MovingEntity extends Entity {
         }
     }
 
-    public float getSubimage() {
-        return subimage;
-    }
+    public float getSubimage() { return subimage; }
+    public void setSubimage(float subimage) { this.subimage = subimage; }
 
-    public void setSubimage(float subimage) {
-        this.subimage = subimage;
-    }
+    public int getNbSubimagesPerCycle() { return nbSubimagesPerCycle; }
+    public void setNbSubimagesPerCycle(int nbSubimagesPerCycle) { this.nbSubimagesPerCycle = nbSubimagesPerCycle; }
 
-    public int getNbSubimagesPerCycle() {
-        return nbSubimagesPerCycle;
-    }
+    public int getDirection() { return direction; }
+    public void setDirection(int direction) { this.direction = direction; }
 
-    public void setNbSubimagesPerCycle(int nbSubimagesPerCycle) {
-        this.nbSubimagesPerCycle = nbSubimagesPerCycle;
-    }
+    public int getXSpd() { return xSpd; }
+    public void setXSpd(int xSpd) { this.xSpd = xSpd; }
 
-    public int getDirection() {
-        return direction;
-    }
+    public int getYSpd() { return ySpd; }
+    public void setYSpd(int ySpd) { this.ySpd = ySpd; }
 
-    public void setDirection(int direction) {
-        this.direction = direction;
-    }
-
-    public int getxSpd() {
-        return xSpd;
-    }
-
-    public void setxSpd(int xSpd) {
-        this.xSpd = xSpd;
-    }
-
-    public int getySpd() {
-        return ySpd;
-    }
-
-    public void setySpd(int ySpd) {
-        this.ySpd = ySpd;
-    }
-
-    public int getSpd() {
-        return spd;
-    }
+    public int getSpd() { return spd; }
 }

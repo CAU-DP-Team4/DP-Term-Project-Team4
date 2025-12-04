@@ -1,10 +1,10 @@
 package game.ghostStates;
 
+import game.entities.Position;
 import game.entities.ghosts.Ghost;
-import game.utils.Utils;
 import game.utils.WallCollisionDetector;
 
-//Classe abstrate pour décrire les différents états de fantômes
+//Classe abstraite pour décrire les différents états de fantômes
 public abstract class GhostState {
     protected Ghost ghost;
 
@@ -20,77 +20,72 @@ public abstract class GhostState {
     public void outsideHouse() {}
     public void insideHouse() {}
 
-    public int[] getTargetPosition(){
-        return new int[2];
-    } //retourne le point que va cibler le fantôme
+    public Position getTargetPosition() {
+        return new Position(0, 0);
+    }
 
     //Méthode pour calculer la prochaine direction que le fantôme va prendre
     public void computeNextDir() {
-        int new_xSpd = 0;
-        int new_ySpd = 0;
+        int newXSpd = 0;
+        int newYSpd = 0;
 
         if (!ghost.onTheGrid()) return; //Le fantôme doit être sur une "case" de la zone de jeu
         if (!ghost.onGameplayWindow()) return;  //Le fantôme doit être dans la zone de jeu
 
-        double minDist = Double.MAX_VALUE; //distance minimale courante entre le fantôme et la cible selon sa prochaine direction
+        double minDist = Double.MAX_VALUE; //distance minimale courante
 
-        //Si le fantôme va actuellement vers la gauche et qu'il n'y a pas de mur à gauche...
-        if (ghost.getxSpd() <= 0 && !WallCollisionDetector.checkWallCollision(ghost, -ghost.getSpd(), 0)) {
-            //On regarde la distance entre la position ciblée et la position potentielle du fantôme si ce dernier irait vers la gauche
-            double distance = Utils.getDistance(ghost.getxPos() - ghost.getSpd(), ghost.getyPos(), getTargetPosition()[0], getTargetPosition()[1]);
+        // 계산에 필요한 변수 미리 추출
+        Position currentPos = ghost.getPosition();
+        Position targetPos = getTargetPosition();
+        int speed = ghost.getSpd();
 
-            //Si cette distance est inférieure à la distance minimale courante, on dit que le fantôme va vers la gauche et on met à jour la distance minimale
+        // LEFT
+        if (ghost.getXSpd() <= 0 && !WallCollisionDetector.checkWallCollision(ghost, -speed, 0)) {
+            double distance = currentPos.distanceTo(targetPos, -speed, 0);
+
             if (distance < minDist) {
-                new_xSpd = -ghost.getSpd();
-                new_ySpd = 0;
+                newXSpd = -speed;
+                newYSpd = 0;
                 minDist = distance;
             }
         }
 
-        //Même chose en testant vers la droite
-        if (ghost.getxSpd() >= 0 && !WallCollisionDetector.checkWallCollision(ghost, ghost.getSpd(), 0)) {
-            double distance = Utils.getDistance(ghost.getxPos() + ghost.getSpd(), ghost.getyPos(),  getTargetPosition()[0], getTargetPosition()[1]);
+        // RIGHT
+        if (ghost.getXSpd() >= 0 && !WallCollisionDetector.checkWallCollision(ghost, speed, 0)) {
+            double distance = currentPos.distanceTo(targetPos, speed, 0);
+
             if (distance < minDist) {
-                new_xSpd = ghost.getSpd();
-                new_ySpd = 0;
+                newXSpd = speed;
+                newYSpd = 0;
                 minDist = distance;
             }
         }
 
-        //Même chose en testant vers le haut
-        if (ghost.getySpd() <= 0 && !WallCollisionDetector.checkWallCollision(ghost, 0, -ghost.getSpd())) {
-            double distance = Utils.getDistance(ghost.getxPos(), ghost.getyPos() - ghost.getSpd(), getTargetPosition()[0], getTargetPosition()[1]);
+        // UP
+        if (ghost.getYSpd() <= 0 && !WallCollisionDetector.checkWallCollision(ghost, 0, -speed)) {
+            double distance = currentPos.distanceTo(targetPos, 0, -speed);
+
             if (distance < minDist) {
-                new_xSpd = 0;
-                new_ySpd = -ghost.getSpd();
+                newXSpd = 0;
+                newYSpd = -speed;
                 minDist = distance;
             }
         }
 
-        //Même chose en testant vers le bas
-        if (ghost.getySpd() >= 0 && !WallCollisionDetector.checkWallCollision(ghost, 0, ghost.getSpd())) {
-            double distance = Utils.getDistance(ghost.getxPos(), ghost.getyPos() + ghost.getSpd(), getTargetPosition()[0], getTargetPosition()[1]);
+        // DOWN
+        if (ghost.getYSpd() >= 0 && !WallCollisionDetector.checkWallCollision(ghost, 0, speed)) {
+            double distance = currentPos.distanceTo(targetPos, 0, speed);
+
             if (distance < minDist) {
-                new_xSpd = 0;
-                new_ySpd = ghost.getSpd();
+                newXSpd = 0;
+                newYSpd = speed;
                 minDist = distance;
             }
         }
 
-        if (new_xSpd == 0 && new_ySpd == 0) return;
+        if (newXSpd == 0 && newYSpd == 0) return;
 
-        //Une fois tous les cas testés, on change la direction du fantôme (au cas où, comme cette direction est définie par une vitesse horizontale et une vitesse verticale, on fait quand même une vérification afin qu'il ne puisse pas aller en diagonale)
-        if (Math.abs(new_xSpd) != Math.abs(new_ySpd)) {
-            ghost.setxSpd(new_xSpd);
-            ghost.setySpd(new_ySpd);
-        } else {
-            if (new_xSpd != 0) {
-                ghost.setxSpd(0);
-                ghost.setxSpd(new_ySpd);
-            }else{
-                ghost.setxSpd(new_xSpd);
-                ghost.setySpd(0);
-            }
-        }
+        ghost.setXSpd(newXSpd);
+        ghost.setYSpd(newYSpd);
     }
 }

@@ -2,18 +2,15 @@ package game.entities;
 
 import java.awt.*;
 
-//Classe abtraite pour décrite une entité
 public abstract class Entity {
     protected int size;
-    protected int xPos;
-    protected int yPos;
+    protected Position position;
 
     protected boolean destroyed = false;
 
     public Entity(int size, int xPos, int yPos) {
         this.size = size;
-        this.xPos = xPos;
-        this.yPos = yPos;
+        this.position = new Position(xPos, yPos);
     }
 
     public void update() {}
@@ -21,8 +18,7 @@ public abstract class Entity {
     public void render(Graphics2D g) {}
 
     public void destroy() {
-        this.xPos = -32;
-        this.yPos = -32;
+        this.position.set(-32, -32);
         destroyed = true;
     }
 
@@ -34,17 +30,21 @@ public abstract class Entity {
         return size;
     }
 
-    public int getxPos() {
-        return xPos;
+    public int getXPos() {
+        return position.getX();
     }
 
-    public int getyPos() {
-        return yPos;
+    public int getYPos() {
+        return position.getY();
+    }
+
+    public Position getPosition() {
+        return this.position;
+    }
+
+    public void setPosition(int x, int y) {
+        this.position = new Position(x, y);
     }
 
     public abstract Rectangle getHitbox();
-
-    public int[] getPosition() {
-        return new int[]{xPos, yPos};
-    }
 }

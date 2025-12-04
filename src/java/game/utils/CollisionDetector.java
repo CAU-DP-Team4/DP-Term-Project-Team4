@@ -15,7 +15,7 @@ public class CollisionDetector {
     //Les entités de type collisionCheck ont une hitbox rectangulaire, et on considère ici que la hitbox de l'entité obj est un point (pour la collision entre Pacman et les fantôme, ça permet d'avoir une marge et faire en sorte que le jeu ne soit pas trop punitif)
     public Entity checkCollision(Entity obj, Class<? extends Entity> collisionCheck) {
         for (Entity e : game.getEntities()) {
-            if (!e.isDestroyed() && collisionCheck.isInstance(e) && e.getHitbox().contains(obj.getxPos() + obj.getSize() / 2, obj.getyPos() + obj.getSize() / 2)) return e;
+            if (!e.isDestroyed() && collisionCheck.isInstance(e) && e.getHitbox().contains(obj.getXPos() + obj.getSize() / 2, obj.getYPos() + obj.getSize() / 2)) return e;
         }
         return null;
     }

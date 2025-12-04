@@ -11,6 +11,6 @@ public class PacGum extends StaticEntity {
     @Override
     public void render(Graphics2D g) {
         g.setColor(new Color(255, 183, 174));
-        g.fillRect(xPos, yPos, size, size);
+        g.fillRect(getXPos(), getYPos(), size, size);
     }
 }

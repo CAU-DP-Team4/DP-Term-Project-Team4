@@ -1,11 +1,12 @@
 package game.ghostStates;
 
+import game.entities.Position;
 import game.entities.ghosts.Ghost;
 import game.utils.Utils;
-import jdk.jshell.execution.Util;
 
 //Classe pour décrire l'état concret d'un fantôme effrayé (après que Pacman ait mangé une SuperPacGum)
-public class FrightenedMode extends GhostState{
+public class FrightenedMode extends GhostState {
+
     public FrightenedMode(Ghost ghost) {
         super(ghost);
     }
@@ -24,12 +25,15 @@ public class FrightenedMode extends GhostState{
 
     //Dans cet état, la position ciblée est une case aléatoire autour du fantôme
     @Override
-    public int[] getTargetPosition(){
-        int[] position = new int[2];
+    public Position getTargetPosition() {
+        // 랜덤 로직을 통해 이동할 오프셋 계산
+        Position currentPos = ghost.getPosition();
+        boolean isXAxis = Utils.randomBool();
 
-        boolean randomAxis = Utils.randomBool();
-        position[0] = ghost.getxPos() + (randomAxis ? Utils.randomInt(-1,1) * 32 : 0);
-        position[1] = ghost.getyPos() + (!randomAxis ? Utils.randomInt(-1,1) * 32 : 0);
-        return position;
+        int randomOffset = Utils.randomInt(-1, 1) * 32;
+        int dx = isXAxis ? randomOffset : 0;
+        int dy = !isXAxis ? randomOffset : 0;
+
+        return currentPos.plus(dx, dy);
     }
 }

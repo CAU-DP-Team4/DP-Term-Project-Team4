@@ -1,11 +1,13 @@
 package game.ghostStates;
 
+import game.entities.Position;
 import game.entities.ghosts.Ghost;
-import game.utils.Utils;
 import game.utils.WallCollisionDetector;
 
 //Classe pour décrire l'état concret d'un fantôme dans sa maison
-public class HouseMode extends GhostState{
+public class HouseMode extends GhostState {
+    private final Position HOUSE_EXIT_TARGET = new Position(208, 168);
+
     public HouseMode(Ghost ghost) {
         super(ghost);
     }
@@ -18,70 +20,72 @@ public class HouseMode extends GhostState{
 
     //Dans cet état, la position ciblée est la case juste au dessus de la maison des fantômes
     @Override
-    public int[] getTargetPosition(){
-        int[] position = new int[2];
-        position[0] = 208;
-        position[1] = 168;
-        return position;
+    public Position getTargetPosition() {
+        return HOUSE_EXIT_TARGET;
     }
 
     //Même chose que la méthode de la classe abstraite, mais on ignore ici les collisions avec les murs de la maison des fantômes
     @Override
     public void computeNextDir() {
-        int new_xSpd = 0;
-        int new_ySpd = 0;
+        int newXSpd = 0;
+        int newYSpd = 0;
 
         if (!ghost.onTheGrid()) return;
         if (!ghost.onGameplayWindow()) return;
 
         double minDist = Double.MAX_VALUE;
 
-        if (ghost.getxSpd() <= 0 && !WallCollisionDetector.checkWallCollision(ghost, -ghost.getSpd(), 0, true)) {
-            double distance = Utils.getDistance(ghost.getxPos() - ghost.getSpd(), ghost.getyPos(), getTargetPosition()[0], getTargetPosition()[1]);
+        Position currentPos = ghost.getPosition();
+        Position targetPos = getTargetPosition();
+        int speed = ghost.getSpd();
+
+        // LEFT
+        if (ghost.getXSpd() <= 0 && !WallCollisionDetector.checkWallCollision(ghost, -speed, 0, true)) {
+            double distance = currentPos.distanceTo(targetPos, -speed, 0);
+
             if (distance < minDist) {
-                new_xSpd = -ghost.getSpd();
-                new_ySpd = 0;
-                minDist = distance;
-            }
-        }
-        if (ghost.getxSpd() >= 0 && !WallCollisionDetector.checkWallCollision(ghost, ghost.getSpd(), 0, true)) {
-            double distance = Utils.getDistance(ghost.getxPos() + ghost.getSpd(), ghost.getyPos(),  getTargetPosition()[0], getTargetPosition()[1]);
-            if (distance < minDist) {
-                new_xSpd = ghost.getSpd();
-                new_ySpd = 0;
-                minDist = distance;
-            }
-        }
-        if (ghost.getySpd() <= 0 && !WallCollisionDetector.checkWallCollision(ghost, 0, -ghost.getSpd(), true)) {
-            double distance = Utils.getDistance(ghost.getxPos(), ghost.getyPos() - ghost.getSpd(), getTargetPosition()[0], getTargetPosition()[1]);
-            if (distance < minDist) {
-                new_xSpd = 0;
-                new_ySpd = -ghost.getSpd();
-                minDist = distance;
-            }
-        }
-        if (ghost.getySpd() >= 0 && !WallCollisionDetector.checkWallCollision(ghost, 0, ghost.getSpd(), true)) {
-            double distance = Utils.getDistance(ghost.getxPos(), ghost.getyPos() + ghost.getSpd(), getTargetPosition()[0], getTargetPosition()[1]);
-            if (distance < minDist) {
-                new_xSpd = 0;
-                new_ySpd = ghost.getSpd();
+                newXSpd = -speed;
+                newYSpd = 0;
                 minDist = distance;
             }
         }
 
-        if (new_xSpd == 0 && new_ySpd == 0) return;
+        // RIGHT
+        if (ghost.getXSpd() >= 0 && !WallCollisionDetector.checkWallCollision(ghost, speed, 0, true)) {
+            double distance = currentPos.distanceTo(targetPos, speed, 0);
 
-        if (java.lang.Math.abs(new_xSpd) != java.lang.Math.abs(new_ySpd)) {
-            ghost.setxSpd(new_xSpd);
-            ghost.setySpd(new_ySpd);
-        } else {
-            if (ghost.getxSpd() != 0) {
-                ghost.setxSpd(0);
-                ghost.setxSpd(new_ySpd);
-            }else{
-                ghost.setxSpd(new_xSpd);
-                ghost.setySpd(0);
+            if (distance < minDist) {
+                newXSpd = speed;
+                newYSpd = 0;
+                minDist = distance;
             }
         }
+
+        // UP
+        if (ghost.getYSpd() <= 0 && !WallCollisionDetector.checkWallCollision(ghost, 0, -speed, true)) {
+            double distance = currentPos.distanceTo(targetPos, 0, -speed);
+
+            if (distance < minDist) {
+                newXSpd = 0;
+                newYSpd = -speed;
+                minDist = distance;
+            }
+        }
+
+        // DOWN
+        if (ghost.getYSpd() >= 0 && !WallCollisionDetector.checkWallCollision(ghost, 0, speed, true)) {
+            double distance = currentPos.distanceTo(targetPos, 0, speed);
+
+            if (distance < minDist) {
+                newXSpd = 0;
+                newYSpd = speed;
+                minDist = distance;
+            }
+        }
+
+        if (newXSpd == 0 && newYSpd == 0) return;
+
+        ghost.setXSpd(newXSpd);
+        ghost.setYSpd(newYSpd);
     }
 }

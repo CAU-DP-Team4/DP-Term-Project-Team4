@@ -2,13 +2,13 @@ package game.ghostStrategies;
 
 import game.Game;
 import game.GameplayPanel;
-import game.entities.Entity;
+import game.entities.Position;
 import game.entities.ghosts.Ghost;
 
 //Stratégie concrète de Clyde (le fantôme jaune)
 public class ClydeStrategy implements IGhostStrategy{
     private Ghost ghost;
-    private final int[] SCATTER_TARGET = new int[]{0, GameplayPanel.height};
+    private final Position SCATTER_TARGET = new Position(0, GameplayPanel.height);
 
     public ClydeStrategy(Ghost ghost) {
         this.ghost = ghost;
@@ -16,8 +16,8 @@ public class ClydeStrategy implements IGhostStrategy{
 
     //Clyde cible directement Pacman s'il est au dela d'un rayon de 8 cases, et sinon il cible sa position de pause
     @Override
-    public int[] getChaseTargetPosition() {
-        Entity pacman = Game.getPacman();
+    public Position getChaseTargetPosition() {
+        var pacman = Game.getPacman();
 
         if (ghost.distanceTo(pacman) >= 256) {
             return pacman.getPosition();
@@ -28,7 +28,7 @@ public class ClydeStrategy implements IGhostStrategy{
 
     //En pause, Clyde cible la case en bas à gauche
     @Override
-    public int[] getScatterTargetPosition() {
+    public Position getScatterTargetPosition() {
         return SCATTER_TARGET;
     }
 }
