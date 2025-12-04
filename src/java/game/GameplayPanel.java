@@ -29,7 +29,8 @@ public class GameplayPanel extends JPanel implements Runnable {
         setPreferredSize(new Dimension(width, height));
         setFocusable(true);
         requestFocus();
-        backgroundImage = ImageIO.read(getClass().getClassLoader().getResource("img/background.png"));
+        // 이미지 경로 로딩 방식
+        backgroundImage = ImageIO.read(getClass().getResource("/img/background.png"));
     }
 
     @Override
@@ -63,7 +64,7 @@ public class GameplayPanel extends JPanel implements Runnable {
         game.input(key);
     }
 
-    //"rendu du jeu" ; on prépare ce qui va être affiché en dessinant sur une "image" : un fond et les entités du jeu au dessus
+    //버퍼 이미지(img)에 게임 요소들을 그립니다.
     public void render() {
         if (g != null) {
             g.drawImage(backgroundImage, 0, 0, width, height, null);
@@ -71,11 +72,21 @@ public class GameplayPanel extends JPanel implements Runnable {
         }
     }
 
-    //Affichage du jeu : on affiche l'image avec le rendu
+    // 직접 그리는 대신 Swing에게 "다시 그려달라"고 요청만 합니다.
     public void draw() {
-        Graphics g2 = this.getGraphics();
-        g2.drawImage(img, 0, 0, width, height, null);
-        g2.dispose();
+        repaint();
+    }
+
+    // Swing이 적절한 타이밍(EDT 스레드)에 호출하여 화면에 실제로 그리는 메서드입니다.
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g); // 이전 잔상을 지우기 위해 필수
+        if (img != null) {
+            // render()에서 미리 그려둔 버퍼 이미지를 화면에 복사
+            g.drawImage(img, 0, 0, width, height, null);
+        }
+        // 맥OS 애니메이션 부드러움을 위해 그래픽 동기화
+        Toolkit.getDefaultToolkit().sync();
     }
 
     @Override
@@ -112,8 +123,9 @@ public class GameplayPanel extends JPanel implements Runnable {
                 lastUpdateTime = now - TBU;
             }
 
-            render();
-            draw();
+            render(); // 버퍼에 그림
+            draw();   // 화면 갱신 요청 (repaint -> paintComponent)
+
             lastRenderTime = now;
             frameCount++;
 
