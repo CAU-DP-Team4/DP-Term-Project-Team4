@@ -9,10 +9,14 @@ import game.gameStates.PlayState;
 import game.ghostFactory.*;
 import game.ghostStates.EatenMode;
 import game.ghostStates.FrightenedMode;
+import game.mode.ClassicModeStrategy;
+import game.mode.ClassicModeStrategy;
+import game.mode.ModeStrategy;
 import game.utils.CollisionDetector;
 import game.utils.CsvReader;
 import game.utils.EntityFactory;
 import game.utils.KeyHandler;
+import game.GameMode;
 
 import java.awt.*;
 import java.net.URISyntaxException;
@@ -31,10 +35,18 @@ public class Game {
 
     private static boolean firstInput = false;
 
+    
+    private ModeStrategy modeStrategy;
+    private GameMode gameMode;
+
     public Game(){
         // 초기 상태를 메뉴로 설정
         this.currentState = new MenuState(this);
+        // 기본 게임 모드는 클래식 모드로 설정 (기본 팩맨게임 모드)
+        this.gameMode = GameMode.CLASSIC;
+        this.modeStrategy = new ClassicModeStrategy();
     }
+
 
     // --- State 위임 메서드 ---
     public void setState(GameState state) {
@@ -89,4 +101,21 @@ public class Game {
     public static boolean getFirstInput() {
         return firstInput;
     }
+
+    public void setModeStrategy(ModeStrategy modeStrategy) {
+        this.modeStrategy = modeStrategy;
+    }
+
+    public ModeStrategy getModeStrategy() {
+        return modeStrategy;
+    }
+
+    public GameMode getGameMode() { 
+        return gameMode; 
+    }
+
+    public void setGameMode(GameMode mode) { 
+        this.gameMode = mode; 
+    }
+    
 }
