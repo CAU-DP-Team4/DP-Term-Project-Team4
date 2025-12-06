@@ -64,6 +64,10 @@ public class PlayState implements GameState, Observer {
         initializeFactoryRegistry(collisionDetector);
 
         this.modeStrategy = game.getModeStrategy();
+        // Notify strategy that the play state is starting so it can initialize (e.g. reset lives)
+        if (this.modeStrategy != null) {
+            this.modeStrategy.onStart(game, this);
+        }
 
         // 맵 파싱 및 엔티티 생성
         for(int xx = 0 ; xx < cellsPerRow ; xx++) {
@@ -72,7 +76,15 @@ public class PlayState implements GameState, Observer {
 
                 if (entityFactoryMap.containsKey(dataChar)) {
                     Entity entity = entityFactoryMap.get(dataChar).create(xx * cellSize, yy * cellSize);
-                    if (entity != null) objects.add(entity);
+                    if (entity != null) {
+                        objects.add(entity);
+
+                        // ghost나 pacman처럼 MovingEntity인 경우 시작 위치 설정
+                        if(entity instanceof MovingEntity) {
+                            ((MovingEntity) entity).setStartPosition(xx * cellSize, yy * cellSize);
+                        }
+                        
+                    }
                 }
             }
         }
@@ -191,5 +203,24 @@ public class PlayState implements GameState, Observer {
     // CollisionDetector 등에서 엔티티 리스트가 필요할 때 호출
     public List<Entity> getEntities() {
         return objects;
+    }
+
+    public void resetPositions() {
+        // Pacman
+        if (Game.getPacman() != null) {
+            Game.getPacman().resetToStart();
+        }
+
+        // Ghost들
+        for (Ghost g : ghosts) {
+            if (g != null) {
+                g.resetToStart();
+                // 필요시 유령 집모드로 초기화. (테스트필요)
+                // g.switchHouseMode();
+            }
+        }
+
+        // 플레이가 재시작되면 첫 입력 기다리도록 재설정
+        Game.setFirstInput(false);
     }
 }
