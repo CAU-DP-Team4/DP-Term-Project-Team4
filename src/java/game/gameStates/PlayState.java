@@ -10,6 +10,7 @@ import game.ghostFactory.*;
 import game.ghostStates.EatenMode;
 import game.ghostStates.FrightenedMode;
 import game.mode.ModeStrategy;
+import game.mode.ModeStrategyFactory;
 import game.utils.CollisionDetector;
 import game.utils.CsvReader;
 import game.utils.EntityFactory; // 사용자가 정의한 인터페이스라고 가정
@@ -63,11 +64,8 @@ public class PlayState implements GameState, Observer {
         // 팩토리 초기화 (사용자 코드 로직 이동)
         initializeFactoryRegistry(collisionDetector);
 
-        this.modeStrategy = game.getModeStrategy();
-        // Notify strategy that the play state is starting so it can initialize (e.g. reset lives)
-        if (this.modeStrategy != null) {
-            this.modeStrategy.onStart(game, this);
-        }
+        this.modeStrategy = ModeStrategyFactory.getStrategy(game.getGameMode());
+        this.modeStrategy.onStart(game, this);
 
         // 맵 파싱 및 엔티티 생성
         for(int xx = 0 ; xx < cellsPerRow ; xx++) {
@@ -215,8 +213,8 @@ public class PlayState implements GameState, Observer {
         for (Ghost g : ghosts) {
             if (g != null) {
                 g.resetToStart();
-                // 필요시 유령 집모드로 초기화. (테스트필요)
-                // g.switchHouseMode();
+                // 유령을 집 모드로 초기화해줘야 나올 수 있음.
+                g.switchHouseMode();
             }
         }
 

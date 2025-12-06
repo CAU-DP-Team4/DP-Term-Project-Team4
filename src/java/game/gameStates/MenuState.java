@@ -3,6 +3,7 @@ package game.gameStates;
 import game.Game;
 import game.GameMode;
 import game.GameplayPanel;
+import game.mode.ModeStrategyFactory;
 import game.utils.KeyHandler;
 import java.awt.*;
 
@@ -23,11 +24,13 @@ public class MenuState implements GameState {
     public void input(KeyHandler k) {
         if (k.k_left.isPressed) {
             modeIndex = (modeIndex - 1 + modes.length) % modes.length;
-            game.setGameMode(modes[modeIndex]);
+            GameMode chosen = modes[modeIndex];
+            game.setGameMode(chosen);
         }
         if (k.k_right.isPressed) {
             modeIndex = (modeIndex + 1) % modes.length;
-            game.setGameMode(modes[modeIndex]);
+            GameMode chosen = modes[modeIndex];
+            game.setGameMode(chosen);
         }
 
         // 엔터키 대신 편의상 UP 키로 시작 (KeyHandler 수정 없이 사용 가능)
