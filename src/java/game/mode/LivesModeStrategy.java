@@ -17,7 +17,7 @@ public class LivesModeStrategy implements ModeStrategy {
     @Override
     public void onCollision(Game game, PlayState playState, Ghost ghost) {
         
-        if (lives <= 0) {
+        if (lives <= 1) {
             game.setState(new GameOverState(game));
         } else {
             decreaseLives();
