@@ -112,6 +112,7 @@ public class Game {
     }
 
     public void setGameMode(GameMode mode) { 
+        if (this.gameMode == mode) return;
         this.gameMode = mode; 
         this.modeStrategy = ModeStrategyFactory.getStrategy(mode);
     }

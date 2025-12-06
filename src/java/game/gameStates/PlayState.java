@@ -63,8 +63,8 @@ public class PlayState implements GameState, Observer {
 
         // 팩토리 초기화 (사용자 코드 로직 이동)
         initializeFactoryRegistry(collisionDetector);
-
-        this.modeStrategy = ModeStrategyFactory.getStrategy(game.getGameMode());
+        
+        this.modeStrategy = game.getModeStrategy();
         this.modeStrategy.onStart(game, this);
 
         // 맵 파싱 및 엔티티 생성
