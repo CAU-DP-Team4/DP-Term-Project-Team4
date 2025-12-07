@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+import game.UIPanel;
 
 public class PlayState implements GameState, Observer {
 
@@ -222,7 +224,14 @@ public class PlayState implements GameState, Observer {
         Game.setFirstInput(false);
     }
 
-    public void updateModeUI(int lives) {
-        GameLauncher.getUIPanel().updateLives(lives);
+    /**
+     * UI를 업데이트하기 위한 범용 헬퍼 메서드.
+     * 모드(strategy)에서 UIPanel의 어떤 메서드든 호출할 수 있도록 Consumer 람다를 받음.
+     * 예: playState.updateUI(p -> p.updateLives(3));
+     */
+    public void updateModeUI(Consumer<UIPanel> action) {
+        UIPanel panel = GameLauncher.getUIPanel();
+        if (panel != null && action != null) action.accept(panel);
     }
+
 }
