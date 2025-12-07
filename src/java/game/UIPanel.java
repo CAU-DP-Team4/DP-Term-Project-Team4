@@ -15,6 +15,7 @@ public class UIPanel extends JPanel implements Observer {
 
     private int score = 0;
     private JLabel scoreLabel;
+    private JLabel modeLabel;
 
     public UIPanel(int width, int height) {
         this.width = width;
@@ -25,6 +26,16 @@ public class UIPanel extends JPanel implements Observer {
         scoreLabel.setFont(scoreLabel.getFont().deriveFont(20.0F));
         scoreLabel.setForeground(Color.white);
         this.add(scoreLabel, BorderLayout.WEST);
+
+        // 확장모드 UI 설정
+        modeLabel = new JLabel("");
+        modeLabel.setFont(scoreLabel.getFont().deriveFont(20.0F));
+        modeLabel.setForeground(Color.white);
+        this.add(modeLabel, BorderLayout.EAST);
+    }
+
+    public void updateLives(int lives) {
+        this.modeLabel.setText("Lives: " + lives);
     }
 
     public void updateScore(int incrScore) {

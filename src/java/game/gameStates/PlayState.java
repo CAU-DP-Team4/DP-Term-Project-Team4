@@ -221,4 +221,8 @@ public class PlayState implements GameState, Observer {
         // 플레이가 재시작되면 첫 입력 기다리도록 재설정
         Game.setFirstInput(false);
     }
+
+    public void updateModeUI(int lives) {
+        GameLauncher.getUIPanel().updateLives(lives);
+    }
 }

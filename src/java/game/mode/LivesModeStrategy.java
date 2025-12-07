@@ -20,16 +20,17 @@ public class LivesModeStrategy implements ModeStrategy {
             game.setState(new GameOverState(game));
         } else {
             decreaseLives();
+            playState.updateModeUI(lives);
+            
             // 팩맨과 유령의 위치를 초기화하는 로직 추가
             playState.resetPositions();
         }
     }
 
-    
-
     @Override
     public void onStart(Game game, PlayState playState) {
         setLives(defaultLives);
+        playState.updateModeUI(defaultLives);
     }
 
     @Override
