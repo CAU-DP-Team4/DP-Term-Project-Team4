@@ -9,6 +9,7 @@ import game.entities.ghosts.*;
 import game.ghostFactory.*;
 import game.ghostStates.EatenMode;
 import game.ghostStates.FrightenedMode;
+import game.mode.ModeStrategy;
 import game.utils.CollisionDetector;
 import game.utils.CsvReader;
 import game.utils.EntityFactory; // 사용자가 정의한 인터페이스라고 가정
@@ -24,6 +25,7 @@ import java.util.Map;
 public class PlayState implements GameState, Observer {
 
     private Game game;
+    private ModeStrategy modeStrategy;
     private List<Entity> objects = new ArrayList<>();
     private List<Ghost> ghosts = new ArrayList<>();
 
@@ -60,6 +62,8 @@ public class PlayState implements GameState, Observer {
 
         // 팩토리 초기화 (사용자 코드 로직 이동)
         initializeFactoryRegistry(collisionDetector);
+
+        this.modeStrategy = game.getModeStrategy();
 
         // 맵 파싱 및 엔티티 생성
         for(int xx = 0 ; xx < cellsPerRow ; xx++) {
@@ -172,9 +176,16 @@ public class PlayState implements GameState, Observer {
         if (gh.getState() instanceof FrightenedMode) {
             gh.getState().eaten();
         } else if (!(gh.getState() instanceof EatenMode)) {
-            // Game Over 시 상태 전환
-            game.setState(new GameOverState(game));
+            if(game.getModeStrategy() != null) {
+                game.getModeStrategy().onCollision(game, this, gh);
+            }else{
+                // 게임모드 미설정 시, Game Over으로 상태전환
+                game.setState(new GameOverState(game));
+            }
+
+            
         }
+        
     }
 
     // CollisionDetector 등에서 엔티티 리스트가 필요할 때 호출
