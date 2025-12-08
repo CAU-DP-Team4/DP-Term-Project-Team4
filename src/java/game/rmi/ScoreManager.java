@@ -26,20 +26,28 @@ public class ScoreManager extends UnicastRemoteObject implements ScoreService {
         }
     }
 
-    public ScoreManager() throws RemoteException {
+    private ScoreManager() throws RemoteException {
         super();
+        if (SingletonHolder.INSTANCE != null) {
+            throw new RuntimeException("Wrong Access. Use getInstance() method to get the single instance of this class.");
+        }
         scores = new ArrayList<>();
     }
 
-    public static synchronized ScoreManager getInstance() {
-        if (instance == null) {
+    private static class SingletonHolder {
+        private static final ScoreManager INSTANCE;
+
+        static {
             try {
-                instance = new ScoreManager();
+                INSTANCE = new ScoreManager();
             } catch (RemoteException e) {
-                e.printStackTrace();
+                throw new ExceptionInInitializerError(e);
             }
         }
-        return instance;
+    }
+
+    public static synchronized ScoreManager getInstance() {
+        return SingletonHolder.INSTANCE;
     }
 
     @Override
