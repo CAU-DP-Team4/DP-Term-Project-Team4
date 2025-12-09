@@ -10,6 +10,7 @@ import game.ghostFactory.*;
 import game.ghostStates.EatenMode;
 import game.ghostStates.FrightenedMode;
 import game.mode.ModeStrategy;
+import game.mode.ModeStrategyFactory;
 import game.utils.CollisionDetector;
 import game.utils.CsvReader;
 import game.utils.EntityFactory; // 사용자가 정의한 인터페이스라고 가정
@@ -21,6 +22,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+import game.UIPanel;
 
 public class PlayState implements GameState, Observer {
 
@@ -62,8 +65,9 @@ public class PlayState implements GameState, Observer {
 
         // 팩토리 초기화 (사용자 코드 로직 이동)
         initializeFactoryRegistry(collisionDetector);
-
+        
         this.modeStrategy = game.getModeStrategy();
+        this.modeStrategy.onStart(game, this);
 
         // 맵 파싱 및 엔티티 생성
         for(int xx = 0 ; xx < cellsPerRow ; xx++) {
@@ -72,7 +76,15 @@ public class PlayState implements GameState, Observer {
 
                 if (entityFactoryMap.containsKey(dataChar)) {
                     Entity entity = entityFactoryMap.get(dataChar).create(xx * cellSize, yy * cellSize);
-                    if (entity != null) objects.add(entity);
+                    if (entity != null) {
+                        objects.add(entity);
+
+                        // ghost나 pacman처럼 MovingEntity인 경우 시작 위치 설정
+                        if(entity instanceof MovingEntity) {
+                            ((MovingEntity) entity).setStartPosition(xx * cellSize, yy * cellSize);
+                        }
+                        
+                    }
                 }
             }
         }
@@ -192,4 +204,34 @@ public class PlayState implements GameState, Observer {
     public List<Entity> getEntities() {
         return objects;
     }
+
+    public void resetPositions() {
+        // Pacman
+        if (Game.getPacman() != null) {
+            Game.getPacman().resetToStart();
+        }
+
+        // Ghost들
+        for (Ghost g : ghosts) {
+            if (g != null) {
+                g.resetToStart();
+                // 유령을 집 모드로 초기화해줘야 나올 수 있음.
+                g.switchHouseMode();
+            }
+        }
+
+        // 플레이가 재시작되면 첫 입력 기다리도록 재설정
+        Game.setFirstInput(false);
+    }
+
+    /**
+     * UI를 업데이트하기 위한 범용 헬퍼 메서드.
+     * 모드(strategy)에서 UIPanel의 어떤 메서드든 호출할 수 있도록 Consumer 람다를 받음.
+     * 예: playState.updateUI(p -> p.updateLives(3));
+     */
+    public void updateModeUI(Consumer<UIPanel> action) {
+        UIPanel panel = GameLauncher.getUIPanel();
+        if (panel != null && action != null) action.accept(panel);
+    }
+
 }

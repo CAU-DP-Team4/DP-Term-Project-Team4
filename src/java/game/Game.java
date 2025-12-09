@@ -12,6 +12,7 @@ import game.ghostStates.FrightenedMode;
 import game.mode.ClassicModeStrategy;
 import game.mode.ClassicModeStrategy;
 import game.mode.ModeStrategy;
+import game.mode.ModeStrategyFactory;
 import game.utils.CollisionDetector;
 import game.utils.CsvReader;
 import game.utils.EntityFactory;
@@ -102,10 +103,6 @@ public class Game {
         return firstInput;
     }
 
-    public void setModeStrategy(ModeStrategy modeStrategy) {
-        this.modeStrategy = modeStrategy;
-    }
-
     public ModeStrategy getModeStrategy() {
         return modeStrategy;
     }
@@ -115,7 +112,9 @@ public class Game {
     }
 
     public void setGameMode(GameMode mode) { 
+        if (this.gameMode == mode) return;
         this.gameMode = mode; 
+        this.modeStrategy = ModeStrategyFactory.getStrategy(mode);
     }
     
 }

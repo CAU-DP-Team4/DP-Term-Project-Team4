@@ -21,17 +21,20 @@ public class MenuState implements GameState {
 
     @Override
     public void input(KeyHandler k) {
+        GameMode chosen = modes[modeIndex];
         if (k.k_left.isPressed) {
             modeIndex = (modeIndex - 1 + modes.length) % modes.length;
-            game.setGameMode(modes[modeIndex]);
         }
         if (k.k_right.isPressed) {
             modeIndex = (modeIndex + 1) % modes.length;
-            game.setGameMode(modes[modeIndex]);
         }
 
         // 엔터키 대신 편의상 UP 키로 시작 (KeyHandler 수정 없이 사용 가능)
-        if (k.k_up.isPressed) game.setState(new PlayState(game));
+        if (k.k_up.isPressed) {
+            game.setGameMode(chosen);
+            game.setState(new PlayState(game));
+
+        }
     }
 
     @Override

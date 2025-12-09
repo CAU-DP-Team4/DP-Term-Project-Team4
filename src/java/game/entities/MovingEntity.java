@@ -16,6 +16,8 @@ public abstract class MovingEntity extends Entity {
     protected int nbSubimagesPerCycle;
     protected int direction = 0;
     protected float imageSpd = 0.2f;
+    protected Position startPosition;;
+    protected boolean hasStartPosition;
 
     public MovingEntity(int size, int xPos, int yPos, int spd, String spriteName, int nbSubimagesPerCycle, float imageSpd) {
         super(size, xPos, yPos);
@@ -28,6 +30,27 @@ public abstract class MovingEntity extends Entity {
             e.printStackTrace();
         }
     }
+
+    public void setStop(){
+        this.xSpd = 0;
+        this.ySpd = 0;
+    }
+
+    public void setStartPosition(int x, int y) {
+        this.startPosition = new Position(x, y);
+        this.hasStartPosition = true;
+    }
+
+    public void resetToStart() {
+        if (!hasStartPosition) return;
+
+        this.setPosition(startPosition.getX(), startPosition.getY());
+        this.setStop();
+        this.subimage = 0;
+        this.direction = 0;
+        this.destroyed = false;
+    }
+
 
     @Override
     public void update() {
