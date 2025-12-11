@@ -22,9 +22,9 @@ public class LivesModeStrategyTest {
 		strategy.onStart(game, playState);
 
 		assertEquals(5, strategy.getLives());
-        assertEquals(5, playState.getUi().getLastLives());
-		assertFalse(playState.wasResetCalled());
-		assertFalse(game.isSetStateCalled());
+        verify(playState).updateModeUI(any());
+        verify(playState, never()).resetPositions();
+        verify(game, never()).setState(any());
 	}
 
 	@Test
